@@ -27,32 +27,82 @@ const Header = styled.header`
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+`;
+
+const HeaderCenter = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 2;
+`;
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+`;
+
 const BackButton = styled(motion.button)`
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 10px;
+  padding: 12px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const ClearButton = styled(motion.button)`
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
   }
 `;
 
 const Title = styled.h1`
   font-size: 1.5rem;
   font-weight: bold;
+  margin: 0 0 5px 0;
+  text-align: center;
 `;
 
 const SessionInfo = styled.div`
   font-size: 0.9rem;
   opacity: 0.8;
+  text-align: center;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
 `;
 
 const MessagesContainer = styled.div`
@@ -396,14 +446,17 @@ const Conversation = () => {
   return (
     <ConversationContainer>
       <Header>
-        <BackButton
-          onClick={() => navigate('/home')}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ArrowLeft size={20} />
-        </BackButton>
-        <div>
+        <HeaderLeft>
+          <BackButton
+            onClick={() => navigate('/home')}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ArrowLeft size={20} />
+          </BackButton>
+        </HeaderLeft>
+        
+        <HeaderCenter>
           <Title>AI 영어 회화</Title>
           <SessionInfo>
             {membership ? 
@@ -412,19 +465,21 @@ const Conversation = () => {
               '멤버십 없음'
             }
           </SessionInfo>
-        </div>
-        <ClearButton
-          onClick={() => {
-            if (window.confirm('모든 대화 내용을 삭제하시겠습니까?')) {
+        </HeaderCenter>
+        
+        <HeaderRight>
+          <ClearButton
+            onClick={() => {
+              if (window.confirm('모든 대화 내용을 삭제하시겠습니까?')) {
               clearMessages();
-            }
-          }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          🗑️
-        </ClearButton>
-        <div style={{ width: 40 }}></div>
+              }
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            🗑️
+          </ClearButton>
+        </HeaderRight>
       </Header>
 
       {/* 음성 인식 결과 오버레이 */}
