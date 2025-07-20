@@ -307,7 +307,7 @@ const Conversation = () => {
   
   // 커스텀 훅 사용
   const { isRecording, isProcessing, startRecording, stopRecording } = useSpeechRecognition();
-  const { messages, addUserMessage, generateAIResponse, addMessage, generateUniqueId } = useMessages();
+  const { messages, addUserMessage, generateAIResponse, addMessage, generateUniqueId, clearMessages } = useMessages();
   const { membership, allMemberships, showMembershipModal, setShowMembershipModal, setMembership, reloadMembership } = useMembership();
   
   // 로컬 상태
@@ -317,17 +317,18 @@ const Conversation = () => {
   // 컴포넌트 마운트 시 초기 인사 메시지 추가
   useEffect(() => {
     if (messages.length === 0) {
-      // AI가 먼저 인사
-      setTimeout(() => {
-        addMessage({
-          id: generateUniqueId(),
-          text: "Hello! I'm your English conversation partner. What topic would you like to discuss today?",
-          isUser: false,
-          timestamp: new Date()
-        });
-      }, 1000);
+      // AI가 먼저 인사 (한 번만 실행되도록 수정)
+      const initialMessage = {
+        id: generateUniqueId(),
+        text: "Hello! I'm your English conversation partner. What topic would you like to discuss today?",
+        isUser: false,
+        timestamp: new Date()
+      };
+      
+      // 즉시 메시지 추가 (setTimeout 제거)
+      addMessage(initialMessage);
     }
-  }, [messages.length, addMessage, generateUniqueId]);
+  }, []); // 의존성 배열을 비워서 한 번만 실행
 
   const handleMicClick = async () => {
     console.log('마이크 버튼 클릭됨');
@@ -412,6 +413,17 @@ const Conversation = () => {
             }
           </SessionInfo>
         </div>
+        <ClearButton
+          onClick={() => {
+            if (window.confirm('모든 대화 내용을 삭제하시겠습니까?')) {
+              clearMessages();
+            }
+          }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          🗑️
+        </ClearButton>
         <div style={{ width: 40 }}></div>
       </Header>
 
@@ -487,10 +499,10 @@ const Conversation = () => {
       )}
 
       <MessagesContainer>
-        <AnimatePresence>
-          {messages.map((message) => (
+        <AnimatePresence mode="wait">
+          {messages.map((message, index) => (
             <Message
-              key={message.id}
+              key={`${message.id}-${index}`}
               isUser={message.isUser}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -503,7 +515,11 @@ const Conversation = () => {
               <MessageContent isUser={message.isUser}>
                 <MessageText>{message.text}</MessageText>
                 <MessageTime>
-                  {message.timestamp.toLocaleTimeString()}
+                  {message.timestamp ? message.timestamp.toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  }) : ''}
                 </MessageTime>
               </MessageContent>
             </Message>

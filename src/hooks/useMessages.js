@@ -12,7 +12,22 @@ export const useMessages = () => {
   };
 
   const addMessage = (message) => {
-    setMessages(prev => [...prev, message]);
+    setMessages(prev => {
+      // 중복 메시지 방지 (같은 ID가 있으면 추가하지 않음)
+      const isDuplicate = prev.some(existingMessage => 
+        existingMessage.id === message.id || 
+        (existingMessage.text === message.text && 
+         existingMessage.isUser === message.isUser &&
+         Math.abs(new Date(existingMessage.timestamp) - new Date(message.timestamp)) < 1000)
+      );
+      
+      if (isDuplicate) {
+        console.log('중복 메시지 감지, 추가하지 않음:', message);
+        return prev;
+      }
+      
+      return [...prev, message];
+    });
   };
 
   const generateAIResponse = async (userText) => {
@@ -58,12 +73,17 @@ export const useMessages = () => {
     });
   };
 
+  const clearMessages = () => {
+    setMessages([]);
+  };
+
   return {
     messages,
     isProcessing,
     addMessage,
     addUserMessage,
     generateAIResponse,
-    generateUniqueId
+    generateUniqueId,
+    clearMessages
   };
 }; 
